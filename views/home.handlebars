@@ -1,0 +1,71 @@
+<h1>{{title}}</h1>
+
+
+<html>
+    <style>
+        #blue_button{
+            border: 1px solid rgb(49, 92, 219);
+            background-color: rgba(0,0,0,0);
+            color: rgb(49, 92, 219)
+            padding:5px;
+        }
+    </style>
+</html>
+
+<input type="text" name="search" id="search" value="{{serach}}" size="50" placeholder="검색어를 입력하세요."/>
+<button id = "blue_button" onclick = "location.href= `/?search= ${document.getElementById('search').value}`" >검색</button>
+<br />
+
+
+<button id="blue_button" onclick = "location.href= '/write'">글쓰기</button>
+
+<br />
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th width="50%">제목</th>
+                <th>작성자</th>
+                <th>조회수</th>
+                <th>등록일</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each posts}}
+                <tr>
+                    <td><a href="/detail/{{_id}}">{{title}}</a></td> <!--상세페이지 링크-->
+                    <td>{{writer}}</td>
+                    <td>{{hits}}</td>
+                    <td>{{dateString createdDt}}</td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<div>  <!--@root.~~:서버가 보내준 값 참조-->
+    {{#with paginator}}
+    <a href="/?page=1&search={{@root.search}}">&lt;&lt;</a> <!--서버가 보내준 값에서 paginator.search를 참조-->
+    {{#if hasPrev}}
+    <a href="/?page={{prevPage}}&search={{@root.search}}">&lt;</a>
+    {{else}}
+    <a>&lt;</a>
+    {{/if}}
+    {{#each pageList}}
+    {{#if (eq . @root.paginator.page)}}
+    <a>{{.}}</a>
+    {{else}}
+    <a href="/?page={{.}}&search={{@root.search}}">{{.}}</a>
+    {{/if}}
+    {{/each}}
+    {{#if hasNext}}
+    <a href="/?page={{nextPage}}&search={{@root.search}}">&gt;</a>
+    <!-- 마지막페이지 인경우 다음 페이지가 없으므로 링크 없음-->
+    {{else}}
+    <a>&gt;</a>
+    {{/if}}
+    <a href="/?page={{lastPage}}&search={{@root.search}}">&gt;&gt;</a>
+    {{/with}}
+    </div>
+    

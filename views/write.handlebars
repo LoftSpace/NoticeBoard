@@ -1,0 +1,53 @@
+<h1>[{{title}}] 글 {{#if (eq mode "create")}}작성{{else}}수정{{/if}}</h1>
+
+
+<div>
+    <form name="boardForm" method="post" {{#if (eq mode "create")}} action ="/write" {{ else }} action="/modify" {{/if}}>
+    <!--수정모드인 경우에는 id값이 필요 & 숨겨진 필드 사용-->
+    {{#if (eq mode "modify")}}
+    <input type="hidden" name="id" value="{{post._id}}" />
+    {{/if}}
+
+    <!--post.dssdsd   수정모드인 경우 채워줌-->
+    <!--제목입력-->
+    <div >
+        <label style="background-color:beige " >제목</label>
+        <input type="text" name="title" placeholder="제목을 작성하세요" value="{{post.title}}" />
+    </div>
+    <!--이름입력-->
+    <div>
+        <label>이름</label>
+        <input type="text" name="writer" placeholder="이름을 넣으세요" value="{{post.writer}}" />
+    </div>
+
+    <!--비밀번호 입력-->
+    <div>
+        <label>비밀번호</label>
+        <input type="password" name="password" placeholder="비밀번호를 입력하세요" />
+    </div>
+
+    <!--본문입력-->
+    <div>
+        <label>본문을 입력하세요</label><br />
+        <textarea placeholder="본문" name="content" cols="50" rows="10">{{post.content}}</textarea>
+        <br />
+    </div>
+
+    <!--버튼 영역-->
+    <div>
+        <button id="blue_button" type="submit">저장</button>
+        <button type="button" onclick="location.href='/'">취소</button>
+    </div>
+    </form>
+</div>
+<!--
+<script>
+    function checkP() {
+        const result = fetch('/write');
+        const data = await result.json();
+        console.log(data);
+        return true;
+        
+    }
+</script>
+*/ -->

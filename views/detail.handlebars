@@ -1,0 +1,120 @@
+<div style="border: 5px dotted rgb(38, 161, 210); border-radius: 5px; padding: 10px;">{{title}}</div>
+<html>
+    <style>
+        #blue_button{
+            border: 1px solid rgb(49, 92, 219);
+            background-color: rgba(0,0,0,0);
+            color: rgb(49, 92, 219);
+            padding:5px;
+        }
+    </style>
+</html>
+
+
+{{#with post}} <!-- post객체 쉽게 사용-->
+<br>
+<div class="text-xl" style="border: 2px dotted rgb(38, 161, 210); border-radius: 5px; padding: 3px">제목: {{title}}</div>
+<br>
+<br>
+<div>
+   <a style="border: 2px solid rgb(49, 92, 219); padding: 3px"> 작성자</a> :<b>{{writer}}</b>
+</div>
+<p>
+
+</p>
+<div>
+    조회수 : {{hits}} | 작성일시: {{dateString createdDt}}
+    <button id= "blue_button" onclick="modifyPost()">수정</button>
+    <button id = "blue_button" onclick="deletePost()">삭제</button>
+</div>
+
+<div>
+    <pre>{{content}}</pre>
+</div>
+
+<section>
+    <div>
+        <h3>3개의 댓글이 있습니다.</h3>
+    </div>
+
+    <form method="post" action="/write-comment">
+    <div>
+        <div>
+            <input type="text" name="name" placeholder="이름" />
+            <input type="password" name="password" placeholder="비밀번호" />
+        </div>
+        <div>
+            <textarea cols="60" rows="3" name="comment" placeholder="댓글을 입력하세요".></textarea>
+            <br  /><br /><button id = "blue_button">댓글쓰기</button>
+        </div>
+        </div>
+        </form>
+</section>
+{{/with}}
+<footer>
+    <div>
+        <a href="/">목록으로</a>
+    </div>
+</footer>
+
+<script>
+    const postOption = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }
+    const deleteOption = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }
+
+    async function deletePost() {
+        const password = await prompt("패스워드를 입력하세요");
+
+        if(!password) {
+            return;
+        }
+        //fetch api를 이용해 delete api 호출
+        const result = await fetch("/delete", { //fetch 브라우저 api를 이용해 Ajax 통신을 한다:페이지 전체를 다시 로드하지 않고 서버와 브라우저간 데이터 통신
+            ...deleteOption,
+            body: JSON.stringify({id: "{{post._id}}",password})
+        });
+
+        const data = await result.json();
+        if(!data.isSuccess) {  //api에서 성공하면 isSuccess는 true가돔
+            alert("삭제에 실패했습니다. 패스워드를 확인하세요.");
+            return;        
+        }
+
+        document.location="/"; //홈 화면으로 
+    }
+
+
+    async function modifyPost() { 
+        const password = await prompt("패스워드를 입력하세요");
+        //prompt에서 취소를 누른 경우
+        if (!password) {
+            return;
+        }
+    
+        //   /check-password url을 부르고  옵션 설정.
+        const result = await fetch("/check-password", { //fetch(url,option) url은 호출할 api의 경로, option은 method,headers,body등의 데이터가 들어감
+            ...postOption,
+            body: JSON.stringify({id: "{{post._id}}",password}) //게시글의 id와 패스워드를 json 형태로 넣어줌
+        });                                                     //HTTP는 json타입을 알지 못하므로 문자열 형태로 변경
+        //결과를 json으로
+        console.log(result);
+        const data = await result.json();
+        console.log(data.isExist); //-> undefined라서 오류떴었음
+        if (data) {
+            document.location = "/modify/{{post._id}}"  //패스워드 올바른경우 수정페이지로 이동
+        } else{
+            alert("패스워드가 올바르지 않습니다.");
+            return;
+        }
+     }
+    
+</script> 
