@@ -14,7 +14,8 @@ async function writePost(collection, post) { //글쓰기 함수: post를 board c
     
     post.hits=0;
     post.createdDt= new Date().toISOString();
-    console.log(post)
+    console.log(post);
+
     return await collection.insertOne(post); //collection 에 post 저장 }
     
 }
@@ -64,6 +65,8 @@ async function updatePost(collection,id,post) {
     };
     return await collection.updateOne({_id: ObjectId(id)}, toUpdatePost); //하나의 도큐먼트를 id로 필터해서 업데이트
 }
+
+
 module.exports = { //require()로 파일 import시 반환 객체
     list,
     writePost,
@@ -71,4 +74,5 @@ module.exports = { //require()로 파일 import시 반환 객체
     getPostById,
     getPostByIdAndPassword,
     updatePost,
+    
 };

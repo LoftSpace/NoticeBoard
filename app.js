@@ -47,13 +47,22 @@ app.get("/modify/:id", async (req,res)=> {
 })
 
 
-
 //글쓰기
 app.post("/write",async (req,res)=> {
     const post = req.body;
 
     const result= await postService.writePost(collection,post); //post에 저장된 내용을 몽고디비에 반환
-    res.redirect(`/detail/${result.insertedId}`); //inserted id 는 document 식별자. 이값으로 상세페이지로 이동 
+    console.log(result);
+    if(result.password === undefined)
+    {
+        
+        res.write('<script>alert("Your password is too short! more than 0");</script>');
+        res.write("<script>window.location=\"/write\"</script>");
+        
+    }
+    else {
+        res.redirect(`/detail/${result.insertedId}`); //inserted id 는 document 식별자. 이값으로 상세페이지로 이동 
+    }
     
 });
 
