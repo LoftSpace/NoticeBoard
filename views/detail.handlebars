@@ -34,10 +34,12 @@
 
 <section>
     <div>
-        <h3>3개의 댓글이 있습니다.</h3>
+        <h3>{{lengthOfList comments}}개의 댓글이 있습니다.</h3>
     </div>
 
+    <!-- 댓글 작성시 API호출 -->
     <form method="post" action="/write-comment">
+        <input type="hidden" name="id" value="{{_id}}" /> <!--게시글의 필드로 댓글 데이터 추가. 게시글의 id-->
     <div>
         <div>
             <input type="text" name="name" placeholder="이름" />
@@ -49,6 +51,23 @@
         </div>
         </div>
         </form>
+</section>
+
+<section>
+    {{#each comments}}
+    <div>
+        <div>
+            작성자 : <b>{{name}}</b>
+        </div>
+        <div>
+            작성일시 : {{dateString createdDt}}
+            <button onclick="deleteComment('{{idx}}')">삭제</button>
+        </div>
+    </div>
+    <div>
+        <pre>{{comment}}</pre>
+    </div>
+    {{/each}}
 </section>
 {{/with}}
 <footer>
@@ -117,4 +136,26 @@
         }
      }
     
+    //댓글 삭제
+    async function deleteComment(idx) {
+        const password = prompt("삭제하려면 패스워드를 입력하세요");
+        console.log(password);
+        if (!password) {
+            return;
+        }
+        //api실행
+        const result = await fetch("/delete-comment", {
+            ...deleteOption,
+            body: JSON.stringify({id: "{{post._id}}",idx,password}) //게시글id,댓글의 인덱스,비밀번호를 body에 실어서 보냄
+        });
+
+        const data = await result.json()
+        if (!data.isSuccess) {
+            alert("삭제에 실패");
+            return;
+        }
+
+        alert("삭제 성공");
+        document.location.reload();
+    }
 </script> 
