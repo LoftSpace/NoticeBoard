@@ -53,7 +53,7 @@ app.post("/write",async (req,res)=> {
 
     const result= await postService.writePost(collection,post); //post에 저장된 내용을 몽고디비에 반환
     console.log(result);
-    if(result.password === undefined)
+    if(post.password.length===0)
     {
         
         res.write('<script>alert("Your password is too short! more than 0");</script>');
@@ -126,7 +126,56 @@ app.delete("/delete", async(req,res)=> {
 
 });
 
+//댓글 추가
+app.post("/write-comment", async (req,res)=> {
+    const {id,name,password,comment} = req.body; //body에서 데이터 가져오기
+    const post = await postService.getPostById(collection,id); //id로 게시글 정보 가져오기
 
+    if(post.comments) { //게시글에 기존 댓글리스트가 있으면 추가
+        post.comments.push({
+            idx: post.comments.length+1,
+            name,
+            password,
+            comment,
+            createdDt: new Date().toISOString(),
+        });
+    }
+    else {
+        post.comments=[
+        {
+        idx:1,
+        name,
+        password,
+        comment,
+        createdDt: new Date().toISOString,
+        },
+        ];
+    }
+
+    postService.updatePost(collection,id,post);
+    return res.redirect(`/detail/${id}`);
+});
+
+//댓글 삭제
+app.delete("/delete-comment",async (req,res)=> {
+    const {id,idx,password} = req.body;
+    
+    const post = await collection.findOne(  //게시글안의 댓글 찾기
+        {
+            _id: ObjectId(id), //게시글 id
+            comments: {$elemMatch: {idx: parseInt(idx),password}}, //댓글의 인덱스 , 비번 매치 여부, 매치시 도큐멘트로 반환
+        },
+        postService.projectionOption, 
+    );
+    
+    if(!post) {
+        return res.json({isSuccess: false});
+    }
+
+    post.comments = post.comments.filter((comment)=> comment.idx !=idx);
+    postService.updatePost(collection,id,post);
+    return res.json({isSuccess: true});
+})
 let collection;
 //핸들바 커스텀 함수 설정 추가
 app.engine(
